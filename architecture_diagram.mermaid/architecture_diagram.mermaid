@@ -1,0 +1,60 @@
+# Architecture Diagram
+```mermaid
+[architecture_diagram.mermaid/architecture_diagram.mermaid]
+```
+
+
+
+graph TB
+    subgraph User["User Interface"]
+        A[User Voice Input]
+        B[User Text Input]
+    end
+
+    subgraph CloudRun["Google Cloud Run<br/>Flask Application"]
+        C[Speech-to-Text<br/>Endpoint]
+        D[Text Weather<br/>Endpoint]
+        E[History<br/>Endpoint]
+        F[Main Application<br/>main.py]
+    end
+
+    subgraph GoogleAPIs["Google Cloud APIs"]
+        G[Speech-to-Text API<br/>Audio → Text]
+        H[Firestore Database<br/>Query History]
+    end
+
+    subgraph External["External Services"]
+        I[OpenWeatherMap API<br/>Weather Data]
+    end
+
+    subgraph Storage["Data Storage"]
+        J[(Firestore<br/>Collections)]
+    end
+
+    A -->|Audio File| C
+    B -->|City Name| D
+    
+    C -->|Audio Data| G
+    G -->|Transcript| F
+    
+    C --> F
+    D --> F
+    
+    F -->|City Name| I
+    I -->|Weather JSON| F
+    
+    F -->|Save Query| H
+    H -->|Store| J
+    
+    E -->|Retrieve| H
+    J -->|Query History| H
+    H -->|Results| E
+    
+    F -->|Response| User
+    E -->|Response| User
+
+    style CloudRun fill:#4285f4,stroke:#333,stroke-width:2px,color:#fff
+    style GoogleAPIs fill:#34a853,stroke:#333,stroke-width:2px,color:#fff
+    style External fill:#fbbc04,stroke:#333,stroke-width:2px,color:#000
+    style Storage fill:#ea4335,stroke:#333,stroke-width:2px,color:#fff
+    style User fill:#9aa0a6,stroke:#333,stroke-width:2px,color:#fff
